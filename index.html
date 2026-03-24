@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ali Chen — Systems & Security</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ── RESET & BASE ───────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0b0e14;
+      --bg2:      #111520;
+      --bg3:      #161c2a;
+      --line:     #1e2840;
+      --text:     #c8d6f0;
+      --muted:    #5a6a8a;
+      --accent:   #4af3b1;       /* cyan-green terminal glow */
+      --accent2:  #6e9fff;       /* electric blue */
+      --danger:   #ff6b6b;
+      --mono:     'IBM Plex Mono', monospace;
+      --sans:     'Syne', sans-serif;
+      --radius:   6px;
+      --glow:     0 0 18px rgba(74, 243, 177, 0.25);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 15px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    ::selection { background: var(--accent); color: #000; }
+
+    /* ── SCANLINE OVERLAY ───────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.08) 2px,
+        rgba(0,0,0,0.08) 4px
+      );
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* ── NAV ────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 48px;
+      background: rgba(11,14,20,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav-logo {
+      font-family: var(--sans);
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: var(--accent);
+      letter-spacing: -0.02em;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 36px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--accent); }
+
+    /* ── HERO ───────────────────────────────────────── */
+    #home {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 48px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Grid background */
+    #home::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+      opacity: 0.4;
+    }
+
+    /* Accent orb */
+    #home::after {
+      content: '';
+      position: absolute;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(74,243,177,0.07) 0%, transparent 70%);
+      top: 10%; left: -10%;
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      max-width: 860px;
+      position: relative;
+    }
+
+    .hero-pre {
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.2s forwards;
+    }
+
+    .hero-pre::before { content: '> '; }
+
+    h1 {
+      font-family: var(--sans);
+      font-weight: 800;
+      font-size: clamp(3rem, 8vw, 6.5rem);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      color: #e8f0ff;
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.35s forwards;
+    }
+
+    h1 span { color: var(--accent); }
+
+    .hero-title {
+      font-size: 0.9rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      margin-bottom: 40px;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.5s forwards;
+    }
+
+    .hero-title strong { color: var(--accent2); font-weight: 500; }
+
+    .hero-desc {
+      max-width: 560px;
+      color: var(--text);
+      font-size: 0.88rem;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.65s forwards;
+      margin-bottom: 48px;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.8s forwards;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 28px;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: var(--radius);
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+      font-weight: 600;
+    }
+
+    .btn-primary:hover {
+      background: #fff;
+      box-shadow: var(--glow);
+    }
+
+    .btn-ghost {
+      border: 1px solid var(--line);
+      color: var(--muted);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* status chip */
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 36px;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.15s forwards;
+    }
+
+    .status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      animation: pulse 2s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* ── SECTION BASE ───────────────────────────────── */
+    section {
+      padding: 100px 48px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .section-label::before { content: '// '; color: var(--muted); }
+
+    h2 {
+      font-family: var(--sans);
+      font-weight: 700;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      letter-spacing: -0.03em;
+      color: #e8f0ff;
+      margin-bottom: 48px;
+      line-height: 1.1;
+    }
+
+    /* divider */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+      margin-bottom: 60px;
+      opacity: 0.3;
+    }
+
+    /* ── ABOUT ──────────────────────────────────────── */
+    #about {
+      border-top: 1px solid var(--line);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: start;
+    }
+
+    .about-text p {
+      color: var(--text);
+      font-size: 0.88rem;
+      margin-bottom: 18px;
+      line-height: 1.85;
+    }
+
+    .about-text p:last-child { margin-bottom: 0; }
+
+    /* terminal card */
+    .terminal-card {
+      background: var(--bg2);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .terminal-bar {
+      background: var(--bg3);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #ffc241; }
+    .dot-g { background: #28ca42; }
+
+    .terminal-filename {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-left: 8px;
+      letter-spacing: 0.05em;
+    }
+
+    .terminal-body {
+      padding: 24px;
+      font-size: 0.8rem;
+      line-height: 2;
+    }
+
+    .t-comment { color: var(--muted); font-style: italic; }
+    .t-key { color: var(--accent2); }
+    .t-val { color: var(--accent); }
+    .t-str { color: #ffb86c; }
+    .t-arr { color: var(--text); }
+
+    /* ── SKILLS ─────────────────────────────────────── */
+    #skills {
+      border-top: 1px solid var(--line);
+    }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .skill-card {
+      background: var(--bg2);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 28px;
+      position: relative;
+      transition: border-color 0.2s, transform 0.2s;
+      overflow: hidden;
+    }
+
+    .skill-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+
+    .skill-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+    }
+
+    .skill-card:hover::before { transform: scaleX(1); }
+
+    .skill-icon {
+      font-size: 1.6rem;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .skill-card h3 {
+      font-family: var(--sans);
+      font-weight: 700;
+      font-size: 1rem;
+      color: #e8f0ff;
+      margin-bottom: 10px;
+    }
+
+    .skill-card p {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 18px;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      padding: 3px 10px;
+      border-radius: 3px;
+      background: rgba(74, 243, 177, 0.08);
+      border: 1px solid rgba(74, 243, 177, 0.2);
+      color: var(--accent);
+    }
+
+    .tag.blue {
+      background: rgba(110, 159, 255, 0.08);
+      border-color: rgba(110, 159, 255, 0.2);
+      color: var(--accent2);
+    }
+
+    .tag.orange {
+      background: rgba(255, 184, 108, 0.08);
+      border-color: rgba(255, 184, 108, 0.2);
+      color: #ffb86c;
+    }
+
+    /* ── CONTACT / FOOTER ───────────────────────────── */
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 60px 48px 40px;
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    .footer-left p {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .footer-left p span { color: var(--accent); }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .footer-links a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 8px 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      transition: all 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* ── ANIMATIONS ─────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* ── RESPONSIVE ─────────────────────────────────── */
+    @media (max-width: 768px) {
+      nav { padding: 16px 24px; }
+      .nav-links { gap: 20px; }
+      #home, section { padding-left: 24px; padding-right: 24px; }
+      .about-grid { grid-template-columns: 1fr; gap: 40px; }
+      footer { padding: 40px 24px; flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAV ──────────────────────────────────────── -->
+  <nav>
+    <a href="#home" class="nav-logo">ali.chen</a>
+    <ul class="nav-links">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- ── HERO ─────────────────────────────────────── -->
+  <section id="home">
+    <div class="hero-inner">
+      <div class="status-chip">
+        <span class="status-dot"></span>
+        Available for research collaboration &amp; internships
+      </div>
+
+      <p class="hero-pre">Hello, World. I'm</p>
+      <h1>Ali<br/><span>Chen.</span></h1>
+
+      <p class="hero-title">
+        <strong>Graduate Student</strong> &amp; Systems Security Enthusiast
+      </p>
+
+      <p class="hero-desc">
+        Exploring the intersection of low-level systems engineering and offensive security—
+        from kernel internals and memory safety in Rust, to CTF exploits and binary analysis.
+      </p>
+
+      <div class="hero-cta">
+        <a href="#about" class="btn btn-primary">Read More</a>
+        <a href="#skills" class="btn btn-ghost">View Skills</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── ABOUT ─────────────────────────────────────── -->
+  <section id="about">
+    <p class="section-label reveal">About Me</p>
+    <h2 class="reveal">Background &amp;<br/>Motivations</h2>
+
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <p>
+          I'm a student based in Taipei, Taiwan, with a strong
+          focus on systems programming and cybersecurity. My academic journey has been driven
+          by a fascination with how computers work at their most fundamental level—from
+          hardware abstractions up through operating system design and into the application layer.
+        </p>
+        <p>
+          My primary technical interests revolve around low-level systems: I write in C and Rust,
+          study the Linux kernel internals, and enjoy understanding how memory, concurrency, and
+          resource management interact beneath the surface. Rust in particular excites me because
+          it challenges programmers to reason rigorously about ownership and safety without
+          sacrificing performance.
+        </p>
+        <p>
+          On the security side, I actively participate in Pwnable and Capture The Flag (CTF)
+          challenges. These competitions push me to understand how programs break—through
+          stack overflows, heap exploitation, format string vulnerabilities, and reverse
+          engineering—which in turn makes me a more thoughtful and defensive software engineer.
+        </p>
+        <p>
+          What I find most compelling is the tension between these two disciplines. High-performance
+          systems demand speed and minimal overhead, while robust security requires careful validation,
+          isolation, and often additional layers of defense. I'm actively learning how to strike that
+          balance—building systems that are both fast and provably safe—and I believe the research
+          community's advances in memory-safe systems languages and formal verification are pointing
+          toward exciting answers.
+        </p>
+        <p>
+          Beyond the technical work, I enjoy reading systems papers, contributing to open-source
+          projects, and collaborating with peers who share a curiosity for the way things work
+          under the hood.
+        </p>
+      </div>
+
+      <div class="reveal">
+        <div class="terminal-card">
+          <div class="terminal-bar">
+            <span class="dot dot-r"></span>
+            <span class="dot dot-y"></span>
+            <span class="dot dot-g"></span>
+            <span class="terminal-filename">ali_chen.json</span>
+          </div>
+          <div class="terminal-body">
+            <div class="t-comment">// profile snapshot</div>
+            <div>{</div>
+            <div>&nbsp;&nbsp;<span class="t-key">"name"</span>: <span class="t-str">"Ali Chen"</span>,</div>
+            <div>&nbsp;&nbsp;<span class="t-key">"location"</span>: <span class="t-str">"Taipei, Taiwan"</span>,</div>
+            <div>&nbsp;&nbsp;<span class="t-key">"focus"</span>: [</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-str">"Systems Programming"</span>,</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-str">"Cybersecurity"</span>,</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-str">"Linux Kernel"</span></div>
+            <div>&nbsp;&nbsp;],</div>
+            <div>&nbsp;&nbsp;<span class="t-key">"languages"</span>: [</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-str">"C"</span>, <span class="t-str">"Rust"</span>, <span class="t-str">"Python"</span>, <span class="t-str">"x86 ASM"</span></div>
+            <div>&nbsp;&nbsp;],</div>
+            <div>&nbsp;&nbsp;<span class="t-key">"ctf_rank"</span>: <span class="t-val">"active competitor"</span>,</div>
+            <div>&nbsp;&nbsp;<span class="t-key">"open_to"</span>: <span class="t-val">true</span></div>
+            <div>}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SKILLS ─────────────────────────────────────── -->
+  <section id="skills">
+    <p class="section-label reveal">Skills &amp; Interests</p>
+    <h2 class="reveal">What I Work With</h2>
+
+    <div class="skills-grid">
+
+      <div class="skill-card reveal">
+        <span class="skill-icon">⚙️</span>
+        <h3>Systems Programming</h3>
+        <p>Writing close-to-the-metal code that is both performant and correct. Comfortable with memory management, concurrency primitives, and OS interfaces.</p>
+        <div class="tags">
+          <span class="tag">C</span>
+          <span class="tag">Rust</span>
+          <span class="tag">POSIX</span>
+          <span class="tag">Multithreading</span>
+        </div>
+      </div>
+
+      <div class="skill-card reveal">
+        <span class="skill-icon">🐧</span>
+        <h3>Linux Kernel</h3>
+        <p>Studying kernel internals including the scheduler, memory subsystem, device drivers, and system call interface.</p>
+        <div class="tags">
+          <span class="tag blue">Kernel Modules</span>
+          <span class="tag blue">Syscalls</span>
+          <span class="tag blue">eBPF</span>
+          <span class="tag blue">VFS</span>
+        </div>
+      </div>
+
+      <div class="skill-card reveal">
+        <span class="skill-icon">🔒</span>
+        <h3>Cybersecurity</h3>
+        <p>Hands-on offensive security through CTF challenges. Focus on binary exploitation, reverse engineering, and vulnerability research.</p>
+        <div class="tags">
+          <span class="tag orange">Pwnable</span>
+          <span class="tag orange">CTF</span>
+          <span class="tag orange">GDB / pwndbg</span>
+          <span class="tag orange">pwntools</span>
+        </div>
+      </div>
+
+      <div class="skill-card reveal">
+        <span class="skill-icon">🦀</span>
+        <h3>Memory Safety &amp; Rust</h3>
+        <p>Exploring how Rust's ownership model and type system eliminate entire classes of bugs at compile time without a garbage collector.</p>
+        <div class="tags">
+          <span class="tag">Ownership</span>
+          <span class="tag">Lifetimes</span>
+          <span class="tag">Unsafe Rust</span>
+          <span class="tag">async/await</span>
+        </div>
+      </div>
+
+      <div class="skill-card reveal">
+        <span class="skill-icon">🔍</span>
+        <h3>Binary Analysis</h3>
+        <p>Deconstructing compiled programs to understand behavior, find vulnerabilities, and build exploits. Familiar with standard reversing toolchains.</p>
+        <div class="tags">
+          <span class="tag blue">Ghidra</span>
+          <span class="tag blue">IDA Free</span>
+          <span class="tag blue">x86 / x86-64 ASM</span>
+        </div>
+      </div>
+
+      <div class="skill-card reveal">
+        <span class="skill-icon">📡</span>
+        <h3>Security Research</h3>
+        <p>Reading and implementing ideas from academic systems and security papers. Interested in fuzzing, formal verification, and sandboxing techniques.</p>
+        <div class="tags">
+          <span class="tag orange">Fuzzing</span>
+          <span class="tag orange">AFL++</span>
+          <span class="tag orange">Sanitizers</span>
+          <span class="tag orange">Seccomp</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── FOOTER / CONTACT ──────────────────────────── -->
+  <footer id="contact">
+    <div class="footer-left">
+      <p style="font-family: var(--sans); font-weight: 700; font-size: 1.1rem; color: #e8f0ff; margin-bottom: 8px;">
+        Ali <span>Chen</span>
+      </p>
+      <p>Graduate Student · Taipei, Taiwan</p>
+      <p>Systems Programming &amp; Cybersecurity</p>
+    </div>
+
+    <div class="footer-links">
+      <a href="alichen308@gmail.com">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        Email
+      </a>
+      <a href="https://github.com/alichaw" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        GitHub
+      </a>
+      <a href="https://linkedin.com/" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        LinkedIn
+      </a>
+    </div>
+  </footer>
+
+  <!-- ── SCROLL REVEAL ─────────────────────────────── -->
+  <script>
+    const observer = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } }),
+      { threshold: 0.12 }
+    );
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>
