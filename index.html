@@ -506,7 +506,6 @@
 </head>
 <body>
 
-  <!-- ── NAV ──────────────────────────────────────── -->
   <nav>
     <a href="#home" class="nav-logo">ali.chen</a>
     <ul class="nav-links">
@@ -517,7 +516,6 @@
     </ul>
   </nav>
 
-  <!-- ── HERO ─────────────────────────────────────── -->
   <section id="home">
     <div class="hero-inner">
       <div class="status-chip">
@@ -529,7 +527,7 @@
       <h1>Ali<br/><span>Chen.</span></h1>
 
       <p class="hero-title">
-        <strong>Graduate Student</strong> &amp; Systems Security Enthusiast
+        <strong>1st-Year Master's Student in ESOE</strong> &amp; Systems Security Enthusiast
       </p>
 
       <p class="hero-desc">
@@ -544,7 +542,6 @@
     </div>
   </section>
 
-  <!-- ── ABOUT ─────────────────────────────────────── -->
   <section id="about">
     <p class="section-label reveal">About Me</p>
     <h2 class="reveal">Background &amp;<br/>Motivations</h2>
@@ -552,36 +549,16 @@
     <div class="about-grid">
       <div class="about-text reveal">
         <p>
-          I'm a student based in Taipei, Taiwan, with a strong
-          focus on systems programming and cybersecurity. My academic journey has been driven
-          by a fascination with how computers work at their most fundamental level—from
-          hardware abstractions up through operating system design and into the application layer.
+          Hello! My name is Ali Chen, and I am from Taipei, Taiwan. I am currently a first-year master's student majoring in Engineering Science and Ocean Engineering (ESOE). Outside of my regular coursework, I am deeply interested in low-level systems programming and cybersecurity. I spend a lot of my free time participating in Capture The Flag (CTF) competitions and studying how operating systems work under the hood. Right now, I am actively learning how to build memory-safe systems using C and Rust. My future goal is to bridge the gap between high-performance engineering and robust security. I am really looking forward to learning new things in this course and collaborating with everyone!
         </p>
         <p>
-          My primary technical interests revolve around low-level systems: I write in C and Rust,
-          study the Linux kernel internals, and enjoy understanding how memory, concurrency, and
-          resource management interact beneath the surface. Rust in particular excites me because
-          it challenges programmers to reason rigorously about ownership and safety without
-          sacrificing performance.
+          Beyond my introduction, my technical interests revolve around low-level systems. I write in C and Rust, study the Linux kernel internals, and enjoy understanding how memory, concurrency, and resource management interact beneath the surface. Rust in particular excites me because it challenges programmers to reason rigorously about ownership and safety without sacrificing performance.
         </p>
         <p>
-          On the security side, I actively participate in Pwnable and Capture The Flag (CTF)
-          challenges. These competitions push me to understand how programs break—through
-          stack overflows, heap exploitation, format string vulnerabilities, and reverse
-          engineering—which in turn makes me a more thoughtful and defensive software engineer.
+          On the security side, these competitions push me to understand how programs break—through stack overflows, heap exploitation, format string vulnerabilities, and reverse engineering—which in turn makes me a more thoughtful and defensive software engineer.
         </p>
         <p>
-          What I find most compelling is the tension between these two disciplines. High-performance
-          systems demand speed and minimal overhead, while robust security requires careful validation,
-          isolation, and often additional layers of defense. I'm actively learning how to strike that
-          balance—building systems that are both fast and provably safe—and I believe the research
-          community's advances in memory-safe systems languages and formal verification are pointing
-          toward exciting answers.
-        </p>
-        <p>
-          Beyond the technical work, I enjoy reading systems papers, contributing to open-source
-          projects, and collaborating with peers who share a curiosity for the way things work
-          under the hood.
+          What I find most compelling is the tension between these two disciplines. High-performance systems demand speed and minimal overhead, while robust security requires careful validation, isolation, and often additional layers of defense. I believe the research community's advances in memory-safe systems languages and formal verification are pointing toward exciting answers.
         </p>
       </div>
 
@@ -597,6 +574,7 @@
             <div class="t-comment">// profile snapshot</div>
             <div>{</div>
             <div>&nbsp;&nbsp;<span class="t-key">"name"</span>: <span class="t-str">"Ali Chen"</span>,</div>
+            <div>&nbsp;&nbsp;<span class="t-key">"major"</span>: <span class="t-str">"ESOE"</span>,</div>
             <div>&nbsp;&nbsp;<span class="t-key">"location"</span>: <span class="t-str">"Taipei, Taiwan"</span>,</div>
             <div>&nbsp;&nbsp;<span class="t-key">"focus"</span>: [</div>
             <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-str">"Systems Programming"</span>,</div>
@@ -615,7 +593,6 @@
     </div>
   </section>
 
-  <!-- ── SKILLS ─────────────────────────────────────── -->
   <section id="skills">
     <p class="section-label reveal">Skills &amp; Interests</p>
     <h2 class="reveal">What I Work With</h2>
@@ -696,18 +673,17 @@
     </div>
   </section>
 
-  <!-- ── FOOTER / CONTACT ──────────────────────────── -->
   <footer id="contact">
     <div class="footer-left">
       <p style="font-family: var(--sans); font-weight: 700; font-size: 1.1rem; color: #e8f0ff; margin-bottom: 8px;">
         Ali <span>Chen</span>
       </p>
-      <p>Graduate Student · Taipei, Taiwan</p>
+      <p>MS Student in ESOE · Taipei, Taiwan</p>
       <p>Systems Programming &amp; Cybersecurity</p>
     </div>
 
     <div class="footer-links">
-      <a href="alichen308@gmail.com">
+      <a href="mailto:alichen308@gmail.com">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
         Email
       </a>
@@ -722,7 +698,6 @@
     </div>
   </footer>
 
-  <!-- ── SCROLL REVEAL ─────────────────────────────── -->
   <script>
     const observer = new IntersectionObserver(
       entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } }),
